@@ -82,7 +82,8 @@ export default function App() {
     const rankNum = parseInt(rank)
     if (!rank || isNaN(rankNum) || rankNum < 1 || allData.length === 0) return
 
-    const lowerBound = Math.floor(rankNum * 0.95)  // 5% below — close miss zone
+    const lowerBound = Math.floor(rankNum * 0.95)  // 5% below rank  — close miss
+    const upperBound = Math.ceil(rankNum * 1.10)   // 10% above rank — comfortable qualify
 
     // ── Build code↔name maps from known records ──
     const codeToName = {}
@@ -134,8 +135,8 @@ export default function App() {
       .filter(g =>
         roundKeys.some(rk => {
           const c = g.rounds[rk]
-          // Show if student qualifies in any round, OR is a close miss (within 5% below rank)
-          return c != null && (c >= rankNum || c >= lowerBound)
+          // Show if cutoff falls in range [lowerBound, upperBound] across any round
+          return c != null && c >= lowerBound && c <= upperBound
         })
       )
       .map(g => {
