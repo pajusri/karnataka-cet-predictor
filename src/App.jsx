@@ -116,8 +116,9 @@ export default function App() {
       groups[key].rounds[rk] = record[category]
     }
 
-    // ── Fix 2: filter to ±range, show qualifiers + close misses ──
+    // ── Fix 2: filter to ±range, drop unknowns, show qualifiers + close misses ──
     const filtered = Object.values(groups)
+      .filter(g => !g.college_code.startsWith('UNK') && g.college_name !== 'Unknown')
       .filter(g =>
         roundKeys.some(rk => {
           const c = g.rounds[rk]
