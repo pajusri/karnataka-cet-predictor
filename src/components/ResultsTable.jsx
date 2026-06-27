@@ -3,10 +3,13 @@ import { useState, useMemo } from 'react'
 function RoundCell({ cutoff, rank }) {
   if (cutoff == null)
     return <td className="px-3 py-3 text-center text-gray-300 text-xs">—</td>
-  const qualifies = cutoff >= rank
+  const qualifies  = cutoff >= rank
+  const closeMiss  = !qualifies && cutoff >= Math.floor(rank * 0.95)
   return (
     <td className={`px-3 py-3 text-center text-sm font-semibold
-      ${qualifies ? 'text-green-700 bg-green-50' : 'text-gray-400'}`}>
+      ${qualifies  ? 'text-green-700 bg-green-50'  : ''}
+      ${closeMiss  ? 'text-yellow-700 bg-yellow-50' : ''}
+      ${!qualifies && !closeMiss ? 'text-gray-300'  : ''}`}>
       {cutoff.toLocaleString()}
     </td>
   )
@@ -102,7 +105,7 @@ export default function ResultsTable({ results, rank, category, roundKeys, round
               <span className="w-3 h-3 rounded-sm bg-green-100 inline-block" /> Green = you qualify
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-sm bg-gray-100 inline-block" /> Gray = cutoff below your rank
+              <span className="w-3 h-3 rounded-sm bg-yellow-100 inline-block" /> Yellow = close miss (within 5%)
             </span>
             <span>Match = rounds where you qualify / total rounds</span>
           </div>
