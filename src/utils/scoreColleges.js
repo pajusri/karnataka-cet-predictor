@@ -46,13 +46,6 @@ export function getTopPicks(groups, rank, roundKeys, n = 5, { branch = '', distr
     actualKeys.some(rk => g.rounds[rk] != null && g.rounds[rk] >= rank)
   )
 
-  // Filter by preferred branch (only narrow if enough results remain)
-  if (branch) {
-    const b = branch.toLowerCase()
-    const branchFiltered = pool.filter(g => g.branch.toLowerCase() === b)
-    if (branchFiltered.length >= 2) pool = branchFiltered
-  }
-
   const scored = pool.map(g => {
     const allCutoffs       = actualKeys.map(rk => g.rounds[rk]).filter(c => c != null)
     const qualifiedCutoffs = allCutoffs.filter(c => c >= rank)
@@ -90,5 +83,15 @@ export function getTopPicks(groups, rank, roundKeys, n = 5, { branch = '', distr
     return { ...g, score: totalScore, bestCutoff, firstRound, qualifiedCount: qualifiedCutoffs.length }
   })
 
-  return scored.sort((a, b) => b.score - a.score).slice(0, n)
+  const sorted = scored.sort((a, b) => b.score - a.score)
+
+  // Preferred branch always comes first; fill remaining spots with other branches
+  if (branch) {
+    const b = branch.toLowerCase()
+    const preferred = sorted.filter(g => g.branch.toLowerCase() === b)
+    const others    = sorted.filter(g => g.branch.toLowerCase() !== b)
+    return [...preferred, ...others].slice(0, n)
+  }
+
+  return sorted.slice(0, n)
 }

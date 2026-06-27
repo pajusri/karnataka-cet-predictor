@@ -212,8 +212,9 @@ export default function App() {
         )}
       </main>
 
-      <footer className="text-center text-xs text-gray-400 py-6 mt-8 border-t border-gray-200">
-        Based on Karnataka Examinations Authority (KEA) cutoff data. For reference only.
+      <footer className="text-center text-xs text-gray-400 py-6 mt-8 border-t border-gray-200 space-y-1">
+        <p>Based on Karnataka Examinations Authority (KEA) cutoff data. For reference only.</p>
+        <p className="text-gray-300">Version 1 · Built by Futurisync Systems</p>
       </footer>
     </div>
   )
