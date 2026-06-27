@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import Header from './components/Header'
 import SearchForm from './components/SearchForm'
 import ResultsTable from './components/ResultsTable'
+import TopPicks from './components/TopPicks'
+import { getTopPicks } from './utils/scoreColleges'
 
 export const CATEGORIES = [
   { group: 'General Merit', items: ['GM', 'GMK', 'GMP', 'GMR'] },
@@ -27,6 +29,7 @@ export default function App() {
   const [rank, setRank]               = useState('')
   const [category, setCategory]       = useState('GM')
   const [results, setResults]         = useState([])
+  const [topPicks, setTopPicks]       = useState([])
   const [hasSearched, setHasSearched] = useState(false)
 
   useEffect(() => {
@@ -143,6 +146,7 @@ export default function App() {
       })
 
     setResults(filtered)
+    setTopPicks(getTopPicks(filtered, rankNum, roundKeys))
     setHasSearched(true)
   }
 
@@ -172,13 +176,20 @@ export default function App() {
         />
 
         {hasSearched && (
-          <ResultsTable
-            results={results}
-            rank={parseInt(rank)}
-            category={category}
-            roundKeys={roundKeys}
-            roundLabels={roundLabels}
-          />
+          <>
+            <TopPicks
+              picks={topPicks}
+              rank={parseInt(rank)}
+              roundLabels={roundLabels}
+            />
+            <ResultsTable
+              results={results}
+              rank={parseInt(rank)}
+              category={category}
+              roundKeys={roundKeys}
+              roundLabels={roundLabels}
+            />
+          </>
         )}
       </main>
 
