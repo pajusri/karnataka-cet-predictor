@@ -25,7 +25,7 @@ CATEGORIES = [
     'STG', 'STK', 'STR',
 ]
 
-COLLEGE_RE = re.compile(r'College:\s*(E\d+)\s+(.*)', re.IGNORECASE)
+COLLEGE_RE = re.compile(r'College:\s*\(?(E\d+)\)?\s*(.*)', re.IGNORECASE)
 
 
 def parse_rank(val):
