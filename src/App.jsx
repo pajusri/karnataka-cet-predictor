@@ -84,43 +84,53 @@ export default function App() {
 
     const lowerBound = Math.floor(rankNum * 0.95)  // 5% below — close miss zone
 
-    // ── Fix 1: build a name/code normalisation map from all records ──
+    // ── Build code↔name maps from known records ──
     const codeToName = {}
-    const nameToCode = {}
     for (const r of allData) {
       if (!r.college_code.startsWith('UNK') && r.college_name !== 'Unknown') {
         codeToName[r.college_code] = r.college_name
-        nameToCode[r.college_name] = r.college_code
       }
     }
 
-    // ── Group records, normalising unknown codes ──
+    // Normalise a college name to a stable key (removes punctuation/spacing differences)
+    function normName(name) {
+      return name.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim()
+    }
+
+    // ── Group by normalised name + branch so UNK records merge with known records ──
     const groups = {}
     for (const record of allData) {
-      let code = record.college_code
-      let name = record.college_name
+      const code = record.college_code
+      const name = record.college_name === 'Unknown'
+        ? (codeToName[code] || 'Unknown')
+        : record.college_name
 
-      // If code is unknown, try to resolve via college name
-      if (code.startsWith('UNK') && nameToCode[name]) code = nameToCode[name]
-      // Always use the best known name for this code
-      if (!code.startsWith('UNK') && codeToName[code]) name = codeToName[code]
+      // Skip fully unresolvable records
+      if (name === 'Unknown') continue
 
-      const key = `${code}||${record.branch}`
+      // Key: normalised name + branch — works even when codes differ across rounds
+      const key = `${normName(name)}||${record.branch}`
+
       if (!groups[key]) {
-        groups[key] = { college_code: code, college_name: name, branch: record.branch, rounds: {} }
-      } else if (groups[key].college_name === 'Unknown' && name !== 'Unknown') {
-        // Upgrade to a better name found in a different round
-        groups[key].college_name = name
-        groups[key].college_code = code
+        groups[key] = {
+          college_code: code.startsWith('UNK') ? '?' : code,
+          college_name: name,
+          branch: record.branch,
+          rounds: {},
+        }
+      } else {
+        // Upgrade to a proper code whenever we find one
+        if (groups[key].college_code === '?' && !code.startsWith('UNK')) {
+          groups[key].college_code = code
+        }
       }
 
       const rk = `${record.year}_${record.round}`
       groups[key].rounds[rk] = record[category]
     }
 
-    // ── Fix 2: filter to ±range, drop unknowns, show qualifiers + close misses ──
+    // ── Filter: qualifiers + close misses ──
     const filtered = Object.values(groups)
-      .filter(g => !g.college_code.startsWith('UNK') && g.college_name !== 'Unknown')
       .filter(g =>
         roundKeys.some(rk => {
           const c = g.rounds[rk]
