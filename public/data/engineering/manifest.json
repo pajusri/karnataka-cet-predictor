@@ -1,10 +1,34 @@
 [
   {
+    "file": "2025_round0_rok.json",
+    "year": 2025,
+    "round": 0,
+    "seat_type": "ROK",
+    "label": "2025 Mock \u2014 ROK",
+    "record_count": 1583
+  },
+  {
+    "file": "2025_round1_rok.json",
+    "year": 2025,
+    "round": 1,
+    "seat_type": "ROK",
+    "label": "2025 Round 1 \u2014 ROK",
+    "record_count": 1583
+  },
+  {
     "file": "2025_round2_rok.json",
     "year": 2025,
     "round": 2,
     "seat_type": "ROK",
     "label": "2025 Round 2 \u2014 ROK",
     "record_count": 1588
+  },
+  {
+    "file": "2025_round3_rok.json",
+    "year": 2025,
+    "round": 3,
+    "seat_type": "ROK",
+    "label": "2025 Round 3 \u2014 ROK",
+    "record_count": 1591
   }
 ]
