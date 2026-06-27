@@ -133,26 +133,33 @@ export default function App() {
       groups[key].rounds[rk] = record[category]
     }
 
-    // ── Filter: qualifiers + close misses ──
-    const filtered = Object.values(groups)
+    function enrichGroup(g) {
+      const qualifiedRks = roundKeys.filter(rk => g.rounds[rk] != null && g.rounds[rk] >= rankNum)
+      const qualifiedCutoffs = qualifiedRks.map(rk => g.rounds[rk])
+      return {
+        ...g,
+        qualifiedCount: qualifiedRks.length,
+        bestCutoff: qualifiedCutoffs.length > 0 ? Math.min(...qualifiedCutoffs) : null,
+      }
+    }
+
+    const allGroups = Object.values(groups)
+
+    // All qualifying groups (any round cutoff >= rank) — used for AI picks
+    const allQualifying = allGroups
+      .filter(g => roundKeys.some(rk => g.rounds[rk] != null && g.rounds[rk] >= rankNum))
+      .map(enrichGroup)
+
+    // Range-filtered groups for the table (show ±5%/10% window only)
+    const filtered = allGroups
       .filter(g =>
         roundKeys.some(rk => {
           const c = g.rounds[rk]
-          // Show if cutoff falls in range [lowerBound, upperBound] across any round
           return c != null && c >= lowerBound && c <= upperBound
         })
       )
-      .map(g => {
-        const qualifiedRks = roundKeys.filter(rk => g.rounds[rk] != null && g.rounds[rk] >= rankNum)
-        const qualifiedCutoffs = qualifiedRks.map(rk => g.rounds[rk])
-        return {
-          ...g,
-          qualifiedCount: qualifiedRks.length,
-          bestCutoff: qualifiedCutoffs.length > 0 ? Math.min(...qualifiedCutoffs) : null,
-        }
-      })
+      .map(enrichGroup)
       .sort((a, b) => {
-        // Qualifying rows first, then by closest cutoff
         if (b.qualifiedCount !== a.qualifiedCount) return b.qualifiedCount - a.qualifiedCount
         const aBest = a.bestCutoff ?? Infinity
         const bBest = b.bestCutoff ?? Infinity
@@ -160,7 +167,8 @@ export default function App() {
       })
 
     setResults(filtered)
-    setTopPicks(getTopPicks(filtered, rankNum, roundKeys, 5, { branch: preferredBranch, district }))
+    // AI picks always use all qualifying colleges — not limited by range filter
+    setTopPicks(getTopPicks(allQualifying, rankNum, roundKeys, 5, { branch: preferredBranch, district }))
     setHasSearched(true)
   }
 

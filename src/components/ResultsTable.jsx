@@ -82,9 +82,14 @@ export default function ResultsTable({ results, rank, category, roundKeys, round
       <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex-1">
           {results.length === 0 ? (
-            <p className="text-red-600 font-medium">
-              No colleges found near rank {rank} for {category}. Try adjusting your rank.
-            </p>
+            rank <= 500
+              ? <p className="text-green-700 font-medium">
+                  Rank {rank} qualifies for virtually all colleges — the table shows a ±10% window which is too narrow for your rank.
+                  See the <strong>AI Top Picks above</strong> for the most selective colleges you can get.
+                </p>
+              : <p className="text-red-600 font-medium">
+                  No colleges found near rank {rank} in {category}. Try adjusting your rank.
+                </p>
           ) : (
             <div>
               <p className="text-gray-800 font-semibold">

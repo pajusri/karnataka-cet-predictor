@@ -83,7 +83,11 @@ export function getTopPicks(groups, rank, roundKeys, n = 5, { branch = '', distr
     return { ...g, score: totalScore, bestCutoff, firstRound, qualifiedCount: qualifiedCutoffs.length }
   })
 
-  const sorted = scored.sort((a, b) => b.score - a.score)
+  // For very high ranks (rank <= 500), every college qualifies — sort by most selective
+  // (lowest cutoff = hardest to get = most prestigious)
+  const sorted = rank <= 500
+    ? scored.sort((a, b) => a.bestCutoff - b.bestCutoff)
+    : scored.sort((a, b) => b.score - a.score)
 
   // Preferred branch always comes first; fill remaining spots with other branches
   if (branch) {
