@@ -13,6 +13,7 @@ export function getTopPicks(groups, rank, roundKeys, n = 5) {
 
   const scored = groups
     .filter(g =>
+      // Only score colleges where student qualifies in at least one actual round
       actualKeys.some(rk => g.rounds[rk] != null && g.rounds[rk] >= rank)
     )
     .map(g => {
