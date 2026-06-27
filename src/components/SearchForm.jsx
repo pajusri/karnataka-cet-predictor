@@ -1,5 +1,36 @@
 import { CATEGORIES } from '../App'
 
+const DISTRICTS = [
+  'Bangalore (Urban)',
+  'Bangalore (Rural)',
+  'Mysuru',
+  'Mangaluru',
+  'Hubli / Dharwad',
+  'Belagavi',
+  'Tumakuru',
+  'Davangere',
+  'Shivamogga',
+  'Kalaburagi',
+  'Ballari',
+  'Hassan',
+  'Mandya',
+  'Udupi',
+  'Chikmagalur',
+  'Raichur',
+  'Bidar',
+  'Vijayapura',
+  'Bagalkot',
+  'Chitradurga',
+  'Kolar',
+  'Ramanagara',
+  'Gadag',
+  'Haveri',
+  'Koppal',
+  'Yadgir',
+  'Chamarajanagar',
+  'Chikkaballapur',
+]
+
 export default function SearchForm({
   courses,
   activeCourse,
@@ -13,6 +44,11 @@ export default function SearchForm({
   dataReady,
   noData,
   roundCount,
+  district,
+  onDistrictChange,
+  preferredBranch,
+  onPreferredBranchChange,
+  uniqueBranches,
 }) {
   function handleKeyDown(e) {
     if (e.key === 'Enter') onSearch()
@@ -40,13 +76,10 @@ export default function SearchForm({
           ))}
         </div>
 
-        {/* Status under tabs */}
         <p className="text-xs mt-2 h-4">
           {dataLoading && <span className="text-gray-400">Loading data…</span>}
           {!dataLoading && noData && (
-            <span className="text-amber-600">
-              No data yet for this course. Run the parser script to add PDFs.
-            </span>
+            <span className="text-amber-600">No data yet for this course.</span>
           )}
           {!dataLoading && dataReady && (
             <span className="text-green-600">
@@ -93,6 +126,42 @@ export default function SearchForm({
         </div>
       </div>
 
+      {/* AI Picks preferences */}
+      <div className="border-t border-gray-100 pt-4">
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">
+          AI Picks Preferences <span className="normal-case font-normal text-gray-400">(optional — helps suggest better colleges)</span>
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-gray-500">Preferred District</label>
+            <select
+              className="h-10 px-3 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-kea-blue"
+              value={district}
+              onChange={e => onDistrictChange(e.target.value)}
+            >
+              <option value="">Any district</option>
+              {DISTRICTS.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-gray-500">Preferred Branch</label>
+            <select
+              className="h-10 px-3 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-kea-blue"
+              value={preferredBranch}
+              onChange={e => onPreferredBranchChange(e.target.value)}
+            >
+              <option value="">Any branch</option>
+              {uniqueBranches.map(b => (
+                <option key={b} value={b}>{b}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div className="flex items-center gap-4">
         <button
           onClick={onSearch}
@@ -104,7 +173,7 @@ export default function SearchForm({
           Find Colleges
         </button>
         <p className="text-xs text-gray-400">
-          Lower rank number = better. Results show cutoffs across all loaded rounds.
+          Lower rank = better. Results cover all loaded rounds.
         </p>
       </div>
     </div>

@@ -26,11 +26,13 @@ export default function App() {
   const [dataLoading, setDataLoading]   = useState(false)
   const [noData, setNoData]             = useState(false)
 
-  const [rank, setRank]               = useState('')
-  const [category, setCategory]       = useState('GM')
-  const [results, setResults]         = useState([])
-  const [topPicks, setTopPicks]       = useState([])
-  const [hasSearched, setHasSearched] = useState(false)
+  const [rank, setRank]                         = useState('')
+  const [category, setCategory]                 = useState('GM')
+  const [district, setDistrict]                 = useState('')
+  const [preferredBranch, setPreferredBranch]   = useState('')
+  const [results, setResults]                   = useState([])
+  const [topPicks, setTopPicks]                 = useState([])
+  const [hasSearched, setHasSearched]           = useState(false)
 
   useEffect(() => {
     fetch('/data/courses.json')
@@ -74,6 +76,7 @@ export default function App() {
         setRoundKeys(rks)
         setRoundLabels(rls)
         setDataLoading(false)
+        setPreferredBranch('')
       })
       .catch(() => { setNoData(true); setDataLoading(false) })
   }, [activeCourse, courses])
@@ -157,7 +160,7 @@ export default function App() {
       })
 
     setResults(filtered)
-    setTopPicks(getTopPicks(filtered, rankNum, roundKeys))
+    setTopPicks(getTopPicks(filtered, rankNum, roundKeys, 5, { branch: preferredBranch, district }))
     setHasSearched(true)
   }
 
@@ -184,6 +187,11 @@ export default function App() {
           dataReady={allData.length > 0}
           noData={noData}
           roundCount={roundKeys.length}
+          district={district}
+          onDistrictChange={setDistrict}
+          preferredBranch={preferredBranch}
+          onPreferredBranchChange={setPreferredBranch}
+          uniqueBranches={[...new Set(allData.map(r => r.branch))].sort()}
         />
 
         {hasSearched && (
