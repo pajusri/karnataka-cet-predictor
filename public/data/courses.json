@@ -1,0 +1,6 @@
+[
+  { "id": "engineering", "label": "Engineering", "folder": "engineering" },
+  { "id": "bsc", "label": "B.Sc Agriculture", "folder": "bsc" },
+  { "id": "veterinary", "label": "Veterinary", "folder": "veterinary" },
+  { "id": "pharmacy", "label": "Pharmacy", "folder": "pharmacy" }
+]
