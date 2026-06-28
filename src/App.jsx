@@ -214,7 +214,7 @@ export default function App() {
 
       {banner && (
         <div
-          className="w-full h-40 bg-cover bg-center relative"
+          className="w-full h-72 bg-cover bg-center relative"
           style={{ backgroundImage: `url('${banner.img}')` }}
         >
           <div className="absolute inset-0 bg-black/30 flex items-center px-8">
