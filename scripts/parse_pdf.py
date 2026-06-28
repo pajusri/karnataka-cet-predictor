@@ -26,9 +26,10 @@ CATEGORIES = [
 ]
 
 # 2025 format: "College: (E001)Name" or "College: E001 Name"
-COLLEGE_RE_2025 = re.compile(r'College:\s*\(?(E\d+)\)?\s*(.*)', re.IGNORECASE)
+# Handles E-prefix (engineering), B-prefix (pharmacy), F-prefix (agri), V-prefix (vet)
+COLLEGE_RE_2025 = re.compile(r'College:\s*\(?([A-Z]\d+)\)?\s*(.*)', re.IGNORECASE)
 # 2022-2024 format: "1 E001 Name" (serial number then code then name)
-COLLEGE_RE_OLD  = re.compile(r'^\s*\d+\s+(E\d+)\s+(.*)')
+COLLEGE_RE_OLD  = re.compile(r'^\s*\d+\s+([A-Z]\d+)\s+(.*)')
 
 # Branch abbreviation prefix in 2022-2024 format (e.g. "AI Artificial Intelligence" → "Artificial Intelligence")
 BRANCH_ABBREV_RE = re.compile(r'^[A-Z]{2,3}\s+')
