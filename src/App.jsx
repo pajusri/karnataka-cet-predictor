@@ -31,7 +31,7 @@ export default function App() {
   const [category, setCategory]                 = useState('GM')
   const [district, setDistrict]                 = useState('')
   const [preferredBranch, setPreferredBranch]   = useState('')
-  const [results, setResults]                   = useState([])
+  const [results, setResults]                   = useState({ rows: [], lower: 0, upper: 0 })
   const [topPicks, setTopPicks]                 = useState([])
   const [hasSearched, setHasSearched]           = useState(false)
 
@@ -96,8 +96,14 @@ export default function App() {
     setRankError('')
     if (allData.length === 0) return
 
-    const lowerBound = Math.floor(rankNum * 0.95)  // 5% below rank  — close miss
-    const upperBound = Math.ceil(rankNum * 1.10)   // 10% above rank — comfortable qualify
+    // Auto-widen range if sub-category (1K, STG, 2AK…) has sparse data
+    // Try ±5%/10% → ±15%/30% → ±30%/50% → all qualifying
+    const RANGE_STEPS = [
+      [0.95, 1.10],
+      [0.85, 1.30],
+      [0.70, 1.50],
+      [0,    Infinity],  // fallback: show all qualifying
+    ]
 
     // ── Build code↔name maps from known records ──
     const codeToName = {}
@@ -161,31 +167,39 @@ export default function App() {
       .filter(g => roundKeys.some(rk => g.rounds[rk] != null && g.rounds[rk] >= rankNum))
       .map(enrichGroup)
 
-    // Range-filtered groups for the table (show ±5%/10% window only)
-    const filtered = allGroups
-      .filter(g =>
-        roundKeys.some(rk => {
-          const c = g.rounds[rk]
-          return c != null && c >= lowerBound && c <= upperBound
+    // Auto-widen range for the table until we get at least some results
+    let filtered = []
+    let usedLower = rankNum, usedUpper = rankNum
+    for (const [lo, hi] of RANGE_STEPS) {
+      const lb = Math.floor(rankNum * lo)
+      const ub = hi === Infinity ? Infinity : Math.ceil(rankNum * hi)
+      filtered = allGroups
+        .filter(g =>
+          roundKeys.some(rk => {
+            const c = g.rounds[rk]
+            return c != null && c >= lb && (ub === Infinity ? true : c <= ub)
+          })
+        )
+        .map(enrichGroup)
+        .sort((a, b) => {
+          if (b.qualifiedCount !== a.qualifiedCount) return b.qualifiedCount - a.qualifiedCount
+          const aBest = a.bestCutoff ?? Infinity
+          const bBest = b.bestCutoff ?? Infinity
+          return aBest - bBest
         })
-      )
-      .map(enrichGroup)
-      .sort((a, b) => {
-        if (b.qualifiedCount !== a.qualifiedCount) return b.qualifiedCount - a.qualifiedCount
-        const aBest = a.bestCutoff ?? Infinity
-        const bBest = b.bestCutoff ?? Infinity
-        return aBest - bBest
-      })
+      usedLower = lb
+      usedUpper = ub
+      if (filtered.length > 0) break
+    }
 
-    setResults(filtered)
-    // AI picks always use all qualifying colleges — not limited by range filter
+    setResults({ rows: filtered, lower: usedLower, upper: usedUpper })
     setTopPicks(getTopPicks(allQualifying, rankNum, roundKeys, 5, { branch: preferredBranch, district }))
     setHasSearched(true)
   }
 
   function handleCourseChange(id) {
     setActiveCourse(id)
-    setResults([])
+    setResults({ rows: [], lower: 0, upper: 0 })
     setHasSearched(false)
   }
 
@@ -222,7 +236,9 @@ export default function App() {
               roundLabels={roundLabels}
             />
             <ResultsTable
-              results={results}
+              results={results.rows}
+              lower={results.lower}
+              upper={results.upper}
               rank={parseInt(rank)}
               category={category}
               roundKeys={roundKeys}

@@ -51,7 +51,7 @@ function shortRound(label) {
   return m ? `Round ${m[1]}` : label
 }
 
-export default function ResultsTable({ results, rank, category, roundKeys, roundLabels }) {
+export default function ResultsTable({ results, lower, upper, rank, category, roundKeys, roundLabels }) {
   const [branchFilter, setBranchFilter]   = useState('')
   const [collegeFilter, setCollegeFilter] = useState('')
   const [page, setPage] = useState(1)
@@ -97,7 +97,10 @@ export default function ResultsTable({ results, rank, category, roundKeys, round
                 <span className="text-gray-600 text-sm"> colleges near rank <strong>{rank}</strong> · {category}</span>
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
-                Showing ranks {Math.floor(rank * 0.95).toLocaleString()} – {Math.ceil(rank * 1.10).toLocaleString()} across all rounds
+                Showing ranks {lower.toLocaleString()} – {upper === Infinity ? 'all' : upper.toLocaleString()} across all rounds
+                {lower < Math.floor(rank * 0.94) && (
+                  <span className="text-amber-500 ml-1">(range widened — sparse data for {category})</span>
+                )}
               </p>
             </div>
           )}
