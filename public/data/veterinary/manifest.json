@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "file": "2022_round1_rok.json",
+    "year": 2022,
+    "round": 1,
+    "label": "2022 Round 1 \u2014 ROK",
+    "seat_type": "ROK",
+    "record_count": 5
+  },
+  {
+    "file": "2022_round2_rok.json",
+    "year": 2022,
+    "round": 2,
+    "label": "2022 Round 2 \u2014 ROK",
+    "seat_type": "ROK",
+    "record_count": 5
+  },
+  {
+    "file": "2022_round3_rok.json",
+    "year": 2022,
+    "round": 3,
+    "label": "2022 Round 3 \u2014 ROK",
+    "seat_type": "ROK",
+    "record_count": 5
+  }
+]
