@@ -83,9 +83,14 @@ export default function App() {
   }, [activeCourse, courses])
 
   function handleSearch() {
-    const rankNum = parseInt(rank)
-    if (!rank || isNaN(rankNum) || rankNum < 1) {
-      setRankError('Please enter a valid rank (1 or above)')
+    // Strip commas/spaces (e.g. "10,000" or "10 000" → "10000")
+    const cleaned = String(rank).replace(/[,\s]/g, '')
+    const rankNum = parseInt(cleaned, 10)
+    if (!cleaned || isNaN(rankNum) || rankNum < 1 || rankNum > 200000) {
+      setRankError(rankNum > 200000
+        ? 'KCET ranks go up to 2,00,000. Please enter a valid rank.'
+        : 'Please enter a valid rank (1 to 2,00,000)'
+      )
       return
     }
     setRankError('')
