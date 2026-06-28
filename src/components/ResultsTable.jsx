@@ -89,13 +89,16 @@ export default function ResultsTable({ results, allQualifying, lower, upper, ran
     // When district is selected, search across ALL qualifying colleges (not just ±range)
     // so colleges from any district (e.g. Tumakuru with high cutoffs) are always reachable
     const base = districtFilter ? (allQualifying || results) : results
+    const yearKeys = [...displayRoundKeys, ...(mockKey ? [mockKey] : [])]
     return base.filter(r => {
       const mb = !branchFilter   || r.branch.toLowerCase().includes(branchFilter.toLowerCase())
       const mc = !collegeFilter  || r.college_name.toLowerCase().includes(collegeFilter.toLowerCase())
       const md = !districtFilter || matchesDistrict(r.college_name, districtFilter)
-      return mb && mc && md
+      // Only show rows that have at least one value for the selected year
+      const hasYear = yearKeys.some(rk => r.rounds[rk] != null)
+      return mb && mc && md && hasYear
     })
-  }, [results, allQualifying, branchFilter, collegeFilter, districtFilter])
+  }, [results, allQualifying, branchFilter, collegeFilter, districtFilter, displayRoundKeys, mockKey])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
