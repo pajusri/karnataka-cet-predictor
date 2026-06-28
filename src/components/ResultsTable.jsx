@@ -59,14 +59,31 @@ export default function ResultsTable({ results, allQualifying, lower, upper, ran
   const [page, setPage] = useState(1)
   const PER_PAGE = 50
 
+  // All years available in data, most recent first
+  const availableYears = useMemo(() =>
+    [...new Set(roundKeys.map(rk => rk.split('_')[0]))].sort().reverse()
+  , [roundKeys])
+
+  const [selectedYear, setSelectedYear] = useState(() => availableYears[0] || '')
+
+  // Keep selectedYear pointing to the most recent year when data changes
+  useEffect(() => {
+    if (availableYears.length > 0) setSelectedYear(availableYears[0])
+  }, [availableYears[0]])
+
   // When a new search runs (defaultDistrict changes), reset table district to match
   useEffect(() => {
     setDistrictFilter(defaultDistrict || '')
     setPage(1)
   }, [defaultDistrict])
 
-  const displayRoundKeys = roundKeys.filter(rk => !rk.endsWith('_0'))
-  const mockKey = roundKeys.find(rk => rk.endsWith('_0'))
+  // Only show rounds for the selected year (exclude mock round 0)
+  const displayRoundKeys = roundKeys.filter(rk =>
+    rk.startsWith(selectedYear + '_') && !rk.endsWith('_0')
+  )
+  const mockKey = roundKeys.find(rk =>
+    rk.startsWith(selectedYear + '_') && rk.endsWith('_0')
+  )
 
   const filtered = useMemo(() => {
     // When district is selected, search across ALL qualifying colleges (not just ±range)
@@ -109,7 +126,7 @@ export default function ResultsTable({ results, allQualifying, lower, upper, ran
                 <span className="text-gray-600 text-sm"> colleges near rank <strong>{rank}</strong> · {category}</span>
               </p>
               <p className="text-xs text-gray-400 mt-0.5">
-                Showing ranks {lower.toLocaleString()} – {upper === Infinity ? 'all' : upper.toLocaleString()} across all rounds
+                Showing {selectedYear} data · ranks {lower.toLocaleString()} – {upper === Infinity ? 'all' : upper.toLocaleString()}
                 {lower < Math.floor(rank * 0.94) && (
                   <span className="text-amber-500 ml-1">(range widened — sparse data for {category})</span>
                 )}
@@ -122,6 +139,17 @@ export default function ResultsTable({ results, allQualifying, lower, upper, ran
         </div>
 
         <div className="flex gap-2 flex-wrap">
+          {/* Year selector */}
+          <select
+            className="text-xs px-3 py-1.5 border border-kea-blue rounded-lg bg-blue-50 text-kea-blue font-semibold focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            value={selectedYear}
+            onChange={e => { setSelectedYear(e.target.value); setPage(1) }}
+          >
+            {availableYears.map(y => (
+              <option key={y} value={y}>{y} Allotment</option>
+            ))}
+          </select>
+
           <select
             className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-kea-blue"
             value={districtFilter}
