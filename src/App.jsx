@@ -31,7 +31,7 @@ export default function App() {
   const [category, setCategory]                 = useState('GM')
   const [district, setDistrict]                 = useState('')
   const [preferredBranch, setPreferredBranch]   = useState('')
-  const [results, setResults]                   = useState({ rows: [], lower: 0, upper: 0 })
+  const [results, setResults]                   = useState({ rows: [], allQualifying: [], lower: 0, upper: 0 })
   const [topPicks, setTopPicks]                 = useState([])
   const [hasSearched, setHasSearched]           = useState(false)
 
@@ -192,14 +192,14 @@ export default function App() {
       if (filtered.length > 0) break
     }
 
-    setResults({ rows: filtered, lower: usedLower, upper: usedUpper })
+    setResults({ rows: filtered, allQualifying, lower: usedLower, upper: usedUpper })
     setTopPicks(getTopPicks(allQualifying, rankNum, roundKeys, 5, { branch: preferredBranch, district }))
     setHasSearched(true)
   }
 
   function handleCourseChange(id) {
     setActiveCourse(id)
-    setResults({ rows: [], lower: 0, upper: 0 })
+    setResults({ rows: [], allQualifying: [], lower: 0, upper: 0 })
     setHasSearched(false)
   }
 
@@ -237,6 +237,7 @@ export default function App() {
             />
             <ResultsTable
               results={results.rows}
+              allQualifying={results.allQualifying}
               lower={results.lower}
               upper={results.upper}
               rank={parseInt(rank)}

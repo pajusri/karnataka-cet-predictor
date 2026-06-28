@@ -52,7 +52,7 @@ function shortRound(label) {
   return m ? `Round ${m[1]}` : label
 }
 
-export default function ResultsTable({ results, lower, upper, rank, category, roundKeys, roundLabels, defaultDistrict }) {
+export default function ResultsTable({ results, allQualifying, lower, upper, rank, category, roundKeys, roundLabels, defaultDistrict }) {
   const [branchFilter, setBranchFilter]     = useState('')
   const [collegeFilter, setCollegeFilter]   = useState('')
   const [districtFilter, setDistrictFilter] = useState(defaultDistrict || '')
@@ -69,13 +69,16 @@ export default function ResultsTable({ results, lower, upper, rank, category, ro
   const mockKey = roundKeys.find(rk => rk.endsWith('_0'))
 
   const filtered = useMemo(() => {
-    return results.filter(r => {
-      const mb = !branchFilter    || r.branch.toLowerCase().includes(branchFilter.toLowerCase())
-      const mc = !collegeFilter   || r.college_name.toLowerCase().includes(collegeFilter.toLowerCase())
-      const md = !districtFilter  || matchesDistrict(r.college_name, districtFilter)
+    // When district is selected, search across ALL qualifying colleges (not just ±range)
+    // so colleges from any district (e.g. Tumakuru with high cutoffs) are always reachable
+    const base = districtFilter ? (allQualifying || results) : results
+    return base.filter(r => {
+      const mb = !branchFilter   || r.branch.toLowerCase().includes(branchFilter.toLowerCase())
+      const mc = !collegeFilter  || r.college_name.toLowerCase().includes(collegeFilter.toLowerCase())
+      const md = !districtFilter || matchesDistrict(r.college_name, districtFilter)
       return mb && mc && md
     })
-  }, [results, branchFilter, collegeFilter, districtFilter])
+  }, [results, allQualifying, branchFilter, collegeFilter, districtFilter])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
