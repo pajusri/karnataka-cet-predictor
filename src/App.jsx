@@ -27,6 +27,7 @@ export default function App() {
   const [noData, setNoData]             = useState(false)
 
   const [rank, setRank]                         = useState('')
+  const [rankError, setRankError]               = useState('')
   const [category, setCategory]                 = useState('GM')
   const [district, setDistrict]                 = useState('')
   const [preferredBranch, setPreferredBranch]   = useState('')
@@ -83,7 +84,12 @@ export default function App() {
 
   function handleSearch() {
     const rankNum = parseInt(rank)
-    if (!rank || isNaN(rankNum) || rankNum < 1 || allData.length === 0) return
+    if (!rank || isNaN(rankNum) || rankNum < 1) {
+      setRankError('Please enter a valid rank (1 or above)')
+      return
+    }
+    setRankError('')
+    if (allData.length === 0) return
 
     const lowerBound = Math.floor(rankNum * 0.95)  // 5% below rank  — close miss
     const upperBound = Math.ceil(rankNum * 1.10)   // 10% above rank — comfortable qualify
@@ -187,7 +193,8 @@ export default function App() {
           activeCourse={activeCourse}
           onCourseChange={handleCourseChange}
           rank={rank}
-          onRankChange={setRank}
+          onRankChange={v => { setRank(v); setRankError('') }}
+          rankError={rankError}
           category={category}
           onCategoryChange={setCategory}
           onSearch={handleSearch}

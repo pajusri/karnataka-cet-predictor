@@ -37,6 +37,7 @@ export default function SearchForm({
   onCourseChange,
   rank,
   onRankChange,
+  rankError,
   category,
   onCategoryChange,
   onSearch,
@@ -99,11 +100,13 @@ export default function SearchForm({
             type="number"
             min="1"
             placeholder="e.g. 5000"
-            className="h-10 px-3 border border-gray-300 rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            className={`h-10 px-3 border rounded-lg text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-kea-blue
+              ${rankError ? 'border-red-400 bg-red-50' : 'border-gray-300'}`}
             value={rank}
             onChange={e => onRankChange(e.target.value)}
             onKeyDown={handleKeyDown}
           />
+          {rankError && <p className="text-xs text-red-500 mt-1">{rankError}</p>}
         </div>
 
         <div className="flex flex-col gap-1.5">
