@@ -25,7 +25,13 @@ CATEGORIES = [
     'STG', 'STK', 'STR',
 ]
 
-COLLEGE_RE = re.compile(r'College:\s*\(?(E\d+)\)?\s*(.*)', re.IGNORECASE)
+# 2025 format: "College: (E001)Name" or "College: E001 Name"
+COLLEGE_RE_2025 = re.compile(r'College:\s*\(?(E\d+)\)?\s*(.*)', re.IGNORECASE)
+# 2022-2024 format: "1 E001 Name" (serial number then code then name)
+COLLEGE_RE_OLD  = re.compile(r'^\s*\d+\s+(E\d+)\s+(.*)')
+
+# Branch abbreviation prefix in 2022-2024 format (e.g. "AI Artificial Intelligence" → "Artificial Intelligence")
+BRANCH_ABBREV_RE = re.compile(r'^[A-Z]{2,3}\s+')
 
 
 def parse_rank(val):
@@ -35,23 +41,32 @@ def parse_rank(val):
     if s in ('--', '-', '—', '', 'N/A', 'NA'):
         return None
     try:
-        f = float(s)
+        f = float(s.replace(',', ''))
         return int(f) if f == int(f) else f
     except (ValueError, TypeError):
         return None
 
 
 def extract_colleges_from_text(text):
-    """Return list of {code, name} dicts found in page text."""
+    """Return list of {code, name} dicts found in page text (handles 2022-2025 formats)."""
     colleges = []
     for line in text.split('\n'):
-        m = COLLEGE_RE.match(line.strip())
+        line = line.strip()
+        m = COLLEGE_RE_2025.match(line)
         if m:
-            colleges.append({
-                'code': m.group(1).strip(),
-                'name': m.group(2).strip(),
-            })
+            colleges.append({'code': m.group(1).strip(), 'name': m.group(2).strip()})
+            continue
+        m = COLLEGE_RE_OLD.match(line)
+        if m:
+            colleges.append({'code': m.group(1).strip(), 'name': m.group(2).strip()})
     return colleges
+
+
+def clean_branch(raw):
+    """Normalise branch name: remove 2-3 letter abbreviation prefix used in 2022-2024 PDFs."""
+    branch = str(raw).strip().replace('\n', ' ')
+    branch = BRANCH_ABBREV_RE.sub('', branch).strip()
+    return branch.upper()
 
 
 def parse_pdf(pdf_path, year, round_num, seat_type='ROK'):
@@ -92,7 +107,7 @@ def parse_pdf(pdf_path, year, round_num, seat_type='ROK'):
                 for row in table[1:]:
                     if not row or not row[0]:
                         continue
-                    course = str(row[0]).strip().replace('\n', ' ')
+                    course = clean_branch(row[0])
                     if not course or course.lower() in ('course name', 'course\nname'):
                         continue
 

@@ -1,5 +1,69 @@
 [
   {
+    "file": "2022_round1_rok.json",
+    "year": 2022,
+    "round": 1,
+    "seat_type": "ROK",
+    "label": "2022 Round 1 \u2014 ROK",
+    "record_count": 1359
+  },
+  {
+    "file": "2022_round2_rok.json",
+    "year": 2022,
+    "round": 2,
+    "seat_type": "ROK",
+    "label": "2022 Round 2 \u2014 ROK",
+    "record_count": 1359
+  },
+  {
+    "file": "2022_round3_rok.json",
+    "year": 2022,
+    "round": 3,
+    "seat_type": "ROK",
+    "label": "2022 Round 3 \u2014 ROK",
+    "record_count": 1358
+  },
+  {
+    "file": "2023_round1_rok.json",
+    "year": 2023,
+    "round": 1,
+    "seat_type": "ROK",
+    "label": "2023 Round 1 \u2014 ROK",
+    "record_count": 1456
+  },
+  {
+    "file": "2024_round0_rok.json",
+    "year": 2024,
+    "round": 0,
+    "seat_type": "ROK",
+    "label": "2024 Round 0 \u2014 ROK",
+    "record_count": 1650
+  },
+  {
+    "file": "2024_round1_rok.json",
+    "year": 2024,
+    "round": 1,
+    "seat_type": "ROK",
+    "label": "2024 Round 1 \u2014 ROK",
+    "record_count": 1650
+  },
+  {
+    "file": "2024_round2_rok.json",
+    "year": 2024,
+    "round": 2,
+    "seat_type": "ROK",
+    "label": "2024 Round 2 \u2014 ROK",
+    "record_count": 1650
+  },
+  {
+    "file": "2024_round3_rok.json",
+    "year": 2024,
+    "round": 3,
+    "seat_type": "ROK",
+    "label": "2024 Round 3 \u2014 ROK",
+    "record_count": 1650
+  },
+  {
     "file": "2025_round0_rok.json",
     "year": 2025,
     "round": 0,
