@@ -1,35 +1,5 @@
 import { CATEGORIES } from '../App'
-
-const DISTRICTS = [
-  'Bangalore (Urban)',
-  'Bangalore (Rural)',
-  'Mysuru',
-  'Mangaluru',
-  'Hubli / Dharwad',
-  'Belagavi',
-  'Tumakuru',
-  'Davangere',
-  'Shivamogga',
-  'Kalaburagi',
-  'Ballari',
-  'Hassan',
-  'Mandya',
-  'Udupi',
-  'Chikmagalur',
-  'Raichur',
-  'Bidar',
-  'Vijayapura',
-  'Bagalkot',
-  'Chitradurga',
-  'Kolar',
-  'Ramanagara',
-  'Gadag',
-  'Haveri',
-  'Koppal',
-  'Yadgir',
-  'Chamarajanagar',
-  'Chikkaballapur',
-]
+import { DISTRICTS } from '../utils/districts.js'
 
 export default function SearchForm({
   courses,

@@ -1,0 +1,68 @@
+export const DISTRICTS = [
+  'Bangalore (Urban)',
+  'Bangalore (Rural)',
+  'Mysuru',
+  'Mangaluru',
+  'Hubli / Dharwad',
+  'Belagavi',
+  'Tumakuru',
+  'Davangere',
+  'Shivamogga',
+  'Kalaburagi',
+  'Ballari',
+  'Hassan',
+  'Mandya',
+  'Udupi',
+  'Chikmagalur',
+  'Raichur',
+  'Bidar',
+  'Vijayapura',
+  'Bagalkot',
+  'Chitradurga',
+  'Kolar',
+  'Ramanagara',
+  'Gadag',
+  'Haveri',
+  'Koppal',
+  'Yadgir',
+  'Chamarajanagar',
+  'Chikkaballapur',
+]
+
+const DISTRICT_KEYWORDS = {
+  'Bangalore (Urban)': ['bangalore', 'bengaluru'],
+  'Bangalore (Rural)': ['bangalore', 'bengaluru', 'ramanagara', 'kolar'],
+  'Mysuru':            ['mysore', 'mysuru'],
+  'Mangaluru':         ['mangalore', 'mangaluru'],
+  'Hubli / Dharwad':   ['hubli', 'dharwad', 'hubballi'],
+  'Belagavi':          ['belagavi', 'belgaum'],
+  'Tumakuru':          ['tumkur', 'tumakuru'],
+  'Davangere':         ['davangere', 'davanagere'],
+  'Shivamogga':        ['shivamogga', 'shimoga'],
+  'Kalaburagi':        ['kalaburagi', 'gulbarga'],
+  'Ballari':           ['ballari', 'bellary'],
+  'Hassan':            ['hassan'],
+  'Mandya':            ['mandya'],
+  'Udupi':             ['udupi'],
+  'Chikmagalur':       ['chikmagalur', 'chikkamagaluru'],
+  'Raichur':           ['raichur'],
+  'Bidar':             ['bidar'],
+  'Vijayapura':        ['vijayapura', 'bijapur'],
+  'Bagalkot':          ['bagalkot'],
+  'Chitradurga':       ['chitradurga'],
+  'Kolar':             ['kolar'],
+  'Ramanagara':        ['ramanagara', 'ramanagar'],
+  'Gadag':             ['gadag'],
+  'Haveri':            ['haveri'],
+  'Koppal':            ['koppal'],
+  'Yadgir':            ['yadgir'],
+  'Chamarajanagar':    ['chamarajanagar', 'chamarajnagar'],
+  'Chikkaballapur':    ['chikkaballapur', 'chikballapur'],
+}
+
+export function matchesDistrict(collegeName, district) {
+  const keywords = DISTRICT_KEYWORDS[district]
+  if (!keywords) return false
+  const name = collegeName.toLowerCase()
+  return keywords.some(kw => name.includes(kw))
+}

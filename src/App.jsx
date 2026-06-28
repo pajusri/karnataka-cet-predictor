@@ -243,6 +243,7 @@ export default function App() {
               category={category}
               roundKeys={roundKeys}
               roundLabels={roundLabels}
+              defaultDistrict={district}
             />
           </>
         )}

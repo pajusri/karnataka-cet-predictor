@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
+import { DISTRICTS, matchesDistrict } from '../utils/districts.js'
 
 function RoundCell({ cutoff, rank }) {
   if (cutoff == null)
@@ -51,22 +52,30 @@ function shortRound(label) {
   return m ? `Round ${m[1]}` : label
 }
 
-export default function ResultsTable({ results, lower, upper, rank, category, roundKeys, roundLabels }) {
-  const [branchFilter, setBranchFilter]   = useState('')
-  const [collegeFilter, setCollegeFilter] = useState('')
+export default function ResultsTable({ results, lower, upper, rank, category, roundKeys, roundLabels, defaultDistrict }) {
+  const [branchFilter, setBranchFilter]     = useState('')
+  const [collegeFilter, setCollegeFilter]   = useState('')
+  const [districtFilter, setDistrictFilter] = useState(defaultDistrict || '')
   const [page, setPage] = useState(1)
   const PER_PAGE = 50
+
+  // When a new search runs (defaultDistrict changes), reset table district to match
+  useEffect(() => {
+    setDistrictFilter(defaultDistrict || '')
+    setPage(1)
+  }, [defaultDistrict])
 
   const displayRoundKeys = roundKeys.filter(rk => !rk.endsWith('_0'))
   const mockKey = roundKeys.find(rk => rk.endsWith('_0'))
 
   const filtered = useMemo(() => {
     return results.filter(r => {
-      const mb = !branchFilter  || r.branch.toLowerCase().includes(branchFilter.toLowerCase())
-      const mc = !collegeFilter || r.college_name.toLowerCase().includes(collegeFilter.toLowerCase())
-      return mb && mc
+      const mb = !branchFilter    || r.branch.toLowerCase().includes(branchFilter.toLowerCase())
+      const mc = !collegeFilter   || r.college_name.toLowerCase().includes(collegeFilter.toLowerCase())
+      const md = !districtFilter  || matchesDistrict(r.college_name, districtFilter)
+      return mb && mc && md
     })
-  }, [results, branchFilter, collegeFilter])
+  }, [results, branchFilter, collegeFilter, districtFilter])
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
   const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE)
@@ -110,11 +119,19 @@ export default function ResultsTable({ results, lower, upper, rank, category, ro
         </div>
 
         <div className="flex gap-2 flex-wrap">
+          <select
+            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            value={districtFilter}
+            onChange={e => { setDistrictFilter(e.target.value); setPage(1) }}
+          >
+            <option value="">All districts</option>
+            {DISTRICTS.map(d => <option key={d} value={d}>{d}</option>)}
+          </select>
           <input type="text" placeholder="Filter branch…"
-            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg w-44 focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg w-36 focus:outline-none focus:ring-2 focus:ring-kea-blue"
             value={branchFilter} onChange={onFilter(setBranchFilter)} />
           <input type="text" placeholder="Filter college…"
-            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg w-44 focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg w-36 focus:outline-none focus:ring-2 focus:ring-kea-blue"
             value={collegeFilter} onChange={onFilter(setCollegeFilter)} />
         </div>
       </div>
