@@ -203,9 +203,28 @@ export default function App() {
     setHasSearched(false)
   }
 
+  const courseBanner = {
+    pharmacy: { img: '/Images/pharmacy-bg.jpg', label: 'Pharmacy' },
+  }
+  const banner = courseBanner[activeCourse]
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+
+      {banner && (
+        <div
+          className="w-full h-40 bg-cover bg-center relative"
+          style={{ backgroundImage: `url('${banner.img}')` }}
+        >
+          <div className="absolute inset-0 bg-black/30 flex items-center px-8">
+            <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">
+              {banner.label} Colleges — Karnataka CET
+            </h2>
+          </div>
+        </div>
+      )}
+
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
         <SearchForm
           courses={courses}
