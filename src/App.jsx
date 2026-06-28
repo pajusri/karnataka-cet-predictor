@@ -203,27 +203,21 @@ export default function App() {
     setHasSearched(false)
   }
 
-  const courseBanner = {
-    pharmacy: { img: '/Images/pharmacy-bg.jpg', label: 'Pharmacy' },
+  const courseBg = {
+    engineering: '/Images/engg.png',
+    pharmacy:    '/Images/pharmacy-bg.jpg',
+    veterinary:  '/Images/vet.png',
   }
-  const banner = courseBanner[activeCourse]
+  const bgImage = courseBg[activeCourse]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen bg-gray-50 bg-cover bg-center bg-fixed transition-all duration-500"
+      style={bgImage ? { backgroundImage: `url('${bgImage}')` } : {}}
+    >
+      {/* Overlay to keep content readable */}
+      <div className="min-h-screen bg-white/80 backdrop-blur-[1px]">
       <Header />
-
-      {banner && (
-        <div
-          className="w-full h-72 bg-cover bg-center relative"
-          style={{ backgroundImage: `url('${banner.img}')` }}
-        >
-          <div className="absolute inset-0 bg-black/30 flex items-center px-8">
-            <h2 className="text-white text-2xl font-bold tracking-wide drop-shadow">
-              {banner.label} Colleges — Karnataka CET
-            </h2>
-          </div>
-        </div>
-      )}
 
       <main className="max-w-6xl mx-auto px-4 py-8 space-y-6">
         <SearchForm
@@ -273,6 +267,7 @@ export default function App() {
         <p>Based on Karnataka Examinations Authority (KEA) cutoff data. For reference only.</p>
         <p className="text-gray-300">Version 1 · Built by Futurisync Systems</p>
       </footer>
+      </div>
     </div>
   )
 }
