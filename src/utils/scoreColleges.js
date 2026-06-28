@@ -74,24 +74,37 @@ export function getTopPicks(groups, rank, roundKeys, n = 5, { branch = '', distr
       else                stabilityScore = 4
     }
 
-    // District bonus: +20pts if college is in preferred district
-    const districtBonus = (district && matchesDistrict(g.college_name, district)) ? 20 : 0
-
-    const totalScore = Math.round(coverageScore + fitScore + stabilityScore + districtBonus)
+    const totalScore = Math.round(coverageScore + fitScore + stabilityScore)
     const firstRound = actualKeys.find(rk => g.rounds[rk] != null && g.rounds[rk] >= rank)
+    const inDistrict = district ? matchesDistrict(g.college_name, district) : false
 
-    return { ...g, score: totalScore, bestCutoff, firstRound, qualifiedCount: qualifiedCutoffs.length }
+    return { ...g, score: totalScore, bestCutoff, firstRound, qualifiedCount: qualifiedCutoffs.length, inDistrict }
   })
 
   // Sort by most selective first: lowest qualifying cutoff = hardest to get = top college
   const sorted = scored.sort((a, b) => a.bestCutoff - b.bestCutoff)
 
-  // Preferred branch always comes first; fill remaining spots with other branches
+  const inBranch = g => branch ? g.branch.toLowerCase() === branch.toLowerCase() : true
+
+  // Priority order: branch+district → branch only → district only → rest
+  if (branch && district) {
+    const g1 = sorted.filter(g =>  inBranch(g) &&  g.inDistrict)
+    const g2 = sorted.filter(g =>  inBranch(g) && !g.inDistrict)
+    const g3 = sorted.filter(g => !inBranch(g) &&  g.inDistrict)
+    const g4 = sorted.filter(g => !inBranch(g) && !g.inDistrict)
+    return [...g1, ...g2, ...g3, ...g4].slice(0, n)
+  }
+
   if (branch) {
-    const b = branch.toLowerCase()
-    const preferred = sorted.filter(g => g.branch.toLowerCase() === b)
-    const others    = sorted.filter(g => g.branch.toLowerCase() !== b)
+    const preferred = sorted.filter(g =>  inBranch(g))
+    const others    = sorted.filter(g => !inBranch(g))
     return [...preferred, ...others].slice(0, n)
+  }
+
+  if (district) {
+    const inDist  = sorted.filter(g =>  g.inDistrict)
+    const outDist = sorted.filter(g => !g.inDistrict)
+    return [...inDist, ...outDist].slice(0, n)
   }
 
   return sorted.slice(0, n)
