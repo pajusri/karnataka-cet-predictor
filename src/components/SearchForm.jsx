@@ -1,5 +1,95 @@
+import { useState, useRef, useEffect } from 'react'
 import { CATEGORIES } from '../App'
 import { DISTRICTS } from '../utils/districts.js'
+
+function BranchCombobox({ value, onChange, options }) {
+  const [query, setQuery]       = useState(value || '')
+  const [open, setOpen]         = useState(false)
+  const [highlighted, setHigh]  = useState(0)
+  const containerRef            = useRef(null)
+
+  // Keep displayed text in sync when parent clears the value
+  useEffect(() => { if (!value) setQuery('') }, [value])
+
+  const matches = query.trim()
+    ? options.filter(o => o.toLowerCase().includes(query.toLowerCase()))
+    : options
+
+  function select(branch) {
+    setQuery(branch)
+    onChange(branch)
+    setOpen(false)
+  }
+
+  function clear() {
+    setQuery('')
+    onChange('')
+    setOpen(false)
+  }
+
+  function handleKey(e) {
+    if (!open) {
+      if (e.key === 'ArrowDown' || e.key === 'Enter') setOpen(true)
+      return
+    }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); setHigh(h => Math.min(h + 1, matches.length - 1)) }
+    if (e.key === 'ArrowUp')    { e.preventDefault(); setHigh(h => Math.max(h - 1, 0)) }
+    if (e.key === 'Enter')      { if (matches[highlighted]) select(matches[highlighted]) }
+    if (e.key === 'Escape')     { setOpen(false) }
+  }
+
+  // Close on outside click
+  useEffect(() => {
+    function onClick(e) { if (containerRef.current && !containerRef.current.contains(e.target)) setOpen(false) }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
+  return (
+    <div className="relative" ref={containerRef}>
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="Type to search branch…"
+          className="h-10 w-full px-3 pr-8 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-kea-blue"
+          value={query}
+          onChange={e => { setQuery(e.target.value); onChange(''); setOpen(true); setHigh(0) }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={handleKey}
+        />
+        {query ? (
+          <button
+            onClick={clear}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none"
+            tabIndex={-1}
+          >×</button>
+        ) : (
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs pointer-events-none">▾</span>
+        )}
+      </div>
+
+      {open && (
+        <ul className="absolute z-50 mt-1 w-full max-h-56 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg text-sm">
+          {matches.length === 0 ? (
+            <li className="px-3 py-2 text-gray-400 italic text-xs">No branches match</li>
+          ) : (
+            matches.map((b, i) => (
+              <li
+                key={b}
+                className={`px-3 py-2 cursor-pointer text-xs leading-snug
+                  ${i === highlighted ? 'bg-blue-50 text-kea-blue' : 'text-gray-700 hover:bg-gray-50'}`}
+                onMouseDown={() => select(b)}
+                onMouseEnter={() => setHigh(i)}
+              >
+                {b}
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 export default function SearchForm({
   courses,
@@ -121,16 +211,11 @@ export default function SearchForm({
 
           <div className="flex flex-col gap-1.5">
             <label className="text-xs text-gray-500">Preferred Branch</label>
-            <select
-              className="h-10 px-3 border border-gray-200 rounded-lg text-sm text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-kea-blue"
+            <BranchCombobox
               value={preferredBranch}
-              onChange={e => onPreferredBranchChange(e.target.value)}
-            >
-              <option value="">Any branch</option>
-              {uniqueBranches.map(b => (
-                <option key={b} value={b}>{b}</option>
-              ))}
-            </select>
+              onChange={onPreferredBranchChange}
+              options={uniqueBranches}
+            />
           </div>
         </div>
       </div>
